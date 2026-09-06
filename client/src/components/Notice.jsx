@@ -1,0 +1,1 @@
+export default function Notice({ title = 'Official details pending', children = 'Official details to be updated.' }) { return <div className="notice"><strong>{title}</strong><p>{children}</p></div>; }

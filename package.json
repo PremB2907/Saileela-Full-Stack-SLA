@@ -1,0 +1,15 @@
+{
+  "name": "saileela-mandal-palkhi",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"npm run server\" \"npm run client\"",
+    "client": "npm --prefix client run dev",
+    "server": "npm --prefix server run dev",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server start",
+    "lint": "npm --prefix client run lint"
+  },
+  "devDependencies": {"concurrently": "^9.1.0"}
+}

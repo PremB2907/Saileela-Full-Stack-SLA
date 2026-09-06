@@ -1,0 +1,7 @@
+import { emptyYatraStatus } from '../config/site.js';
+import mongoose from 'mongoose';
+import { CommitteeMember, GalleryItem, ScheduleEvent, SiteSettings, SocialWorkActivity, YatraStatus } from '../models/index.js';
+
+export async function getSite(req, res) { if (mongoose.connection.readyState !== 1) return res.json({ success: true, settings: [] }); const settings = await SiteSettings.find({ verified: true }).lean(); res.json({ success: true, settings }); }
+export async function getYatra(req, res) { if (mongoose.connection.readyState !== 1) return res.json({ success: true, status: emptyYatraStatus }); const status = await YatraStatus.findOne().sort({ updatedAt: -1 }).lean(); res.json({ success: true, status: status || emptyYatraStatus }); }
+export async function getContent(req, res) { if (mongoose.connection.readyState !== 1) return res.json({ success: true, schedule: [], gallery: [], committee: [], socialWork: [] }); const [schedule, gallery, committee, socialWork] = await Promise.all([ScheduleEvent.find({ published: true, verified: true }).sort({ date: 1 }).lean(), GalleryItem.find({ published: true, verified: true }).sort({ createdAt: -1 }).lean(), CommitteeMember.find({ verified: true }).sort({ displayOrder: 1 }).lean(), SocialWorkActivity.find({ published: true, verified: true }).sort({ createdAt: -1 }).lean()]); res.json({ success: true, schedule, gallery, committee, socialWork }); }

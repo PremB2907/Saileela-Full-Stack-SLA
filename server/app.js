@@ -1,0 +1,44 @@
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import authRoutes from './routes/authRoutes.js';
+import publicRoutes from './routes/publicRoutes.js';
+import registrationRoutes from './routes/registrationRoutes.js';
+import donationRoutes from './routes/donationRoutes.js';
+import enquiryRoutes from './routes/enquiryRoutes.js';
+import dbtRoutes from './routes/dbtRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import receiptRoutes from './routes/receiptRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import tshirtRoutes from './routes/tshirtRoutes.js';
+import { errorHandler, notFound } from './middleware/error.js';
+
+const app = express();
+app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }), authRoutes);
+app.use('/api', publicRoutes);
+app.use('/api/registrations', registrationRoutes);
+app.use('/api/donations', donationRoutes);
+app.use('/api/enquiries', enquiryRoutes);
+app.use('/api/dbt', dbtRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/receipts', receiptRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/tshirts', tshirtRoutes);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.get('/api/health', (req, res) => res.json({ success: true, service: 'saileela-api' }));
+if (process.env.NODE_ENV === 'production') {
+	const clientDist = path.resolve(__dirname, '../client/dist');
+	app.use(express.static(clientDist));
+	app.use((req, res, next) => req.path.startsWith('/api/') ? next() : res.sendFile(path.join(clientDist, 'index.html')));
+}
+app.use(notFound);
+app.use(errorHandler);
+export default app;

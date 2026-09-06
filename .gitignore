@@ -1,16 +1,13 @@
 node_modules/
+client/node_modules/
+server/node_modules/
+client/dist/
 .env
 .env.*
 !.env.example
-logs/*
-receipts/*
-!.gitkeep
+server/uploads/
+server/generated/
+logs/
+receipts/
+*.log
 .DS_Store
-
-# Python
-venv/
-__pycache__/
-*.pyc
-
-# Google Sheets
-credentials.json

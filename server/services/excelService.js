@@ -1,0 +1,4 @@
+import ExcelJS from 'exceljs';
+
+export async function createWorkbook(records, sheetName = 'Saileela Records') { const workbook = new ExcelJS.Workbook(); const sheet = workbook.addWorksheet(sheetName); if (records.length) { sheet.columns = Object.keys(records[0]).map((key) => ({ header: key, key })); records.forEach((record) => sheet.addRow(record)); } return workbook.xlsx.writeBuffer(); }
+export async function parseWorkbook(buffer) { const workbook = new ExcelJS.Workbook(); await workbook.xlsx.load(buffer); const sheet = workbook.worksheets[0]; if (!sheet) return []; const headers = sheet.getRow(1).values.slice(1); const rows = []; sheet.eachRow((row, index) => { if (index === 1) return; const record = {}; headers.forEach((header, position) => { record[header] = row.getCell(position + 1).value ?? ''; }); rows.push(record); }); return rows; }

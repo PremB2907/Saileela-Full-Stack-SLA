@@ -1,0 +1,1 @@
+export default function PageHeader({ eyebrow = 'Saileela Mandal Palkhi', title, children }) { return <section className="page-header"><div className="shell"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1>{children && <p>{children}</p>}</div></section>; }
