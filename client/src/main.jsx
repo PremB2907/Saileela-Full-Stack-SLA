@@ -7,4 +7,5 @@ import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import './styles.css';
 import './content.css';
+import './ui-polish.css';
 ReactDOM.createRoot(document.getElementById('root')).render(<React.StrictMode><HelmetProvider><BrowserRouter><LanguageProvider><AuthProvider><App/></AuthProvider></LanguageProvider></BrowserRouter></HelmetProvider></React.StrictMode>);
