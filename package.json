@@ -11,5 +11,10 @@
     "start": "npm --prefix server start",
     "lint": "npm --prefix client run lint"
   },
-  "devDependencies": {"concurrently": "^9.1.0"}
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "dependencies": {
+    "mongodb": "^7.6.0"
+  }
 }
