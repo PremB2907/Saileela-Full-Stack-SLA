@@ -1,5 +1,5 @@
 import express from 'express';
-import { getYatraStatus, updateYatraStatus, getAnnouncements, createAnnouncement, getSevaEvents, createSevaEvent, getVolunteers, createVolunteer } from '../controllers/operationsController.js';
+import { getYatraStatus, updateYatraStatus, getAnnouncements, createAnnouncement, getSevaEvents, createSevaEvent, getVolunteers, createVolunteer, updateVolunteer } from '../controllers/operationsController.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -15,5 +15,6 @@ router.post('/seva', requireAuth, createSevaEvent);
 
 router.get('/volunteers', requireAuth, getVolunteers);
 router.post('/volunteers', createVolunteer);
+router.patch('/volunteers/:id', requireAuth, updateVolunteer);
 
 export default router;

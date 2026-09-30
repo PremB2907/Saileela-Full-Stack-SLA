@@ -45,7 +45,7 @@ export function AdminLogin() {
 export function AdminDashboard() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const [data, setData] = useState({ donations: [], announcements: [], yatra: null });
+  const [data, setData] = useState({ donations: [], announcements: [], yatra: null, volunteers: [] });
   const [error, setError] = useState('');
 
   if (!user) return <Navigate to="/admin/login" />;
@@ -65,6 +65,9 @@ export function AdminDashboard() {
       } else if (activeTab === 'announcements') {
         const res = await api.get('/operations/announcements');
         setData(d => ({ ...d, announcements: res.data.announcements || [] }));
+      } else if (activeTab === 'volunteers') {
+        const res = await api.get('/operations/volunteers');
+        setData(d => ({ ...d, volunteers: res.data.volunteers || [] }));
       }
     } catch (err) {
       setError('Could not load data.');
@@ -99,6 +102,15 @@ export function AdminDashboard() {
     }
   }
 
+  async function updateVolunteerStatus(id, newStatus) {
+    try {
+      await api.patch(`/operations/volunteers/${id}`, { status: newStatus });
+      loadData();
+    } catch(err) {
+      alert('Failed to update status');
+    }
+  }
+
   return (
     <>
       <PageHeader title="Saileela CMS">Central Command & Live Operations</PageHeader>
@@ -108,6 +120,7 @@ export function AdminDashboard() {
             <button style={{ fontWeight: activeTab === 'overview' ? 'bold' : 'normal', textAlign: 'left', padding: '12px' }} onClick={() => setActiveTab('overview')}>Dashboard Overview</button>
             <button style={{ fontWeight: activeTab === 'yatra' ? 'bold' : 'normal', textAlign: 'left', padding: '12px' }} onClick={() => setActiveTab('yatra')}>Yatra Live Control</button>
             <button style={{ fontWeight: activeTab === 'announcements' ? 'bold' : 'normal', textAlign: 'left', padding: '12px' }} onClick={() => setActiveTab('announcements')}>Announcements</button>
+            <button style={{ fontWeight: activeTab === 'volunteers' ? 'bold' : 'normal', textAlign: 'left', padding: '12px' }} onClick={() => setActiveTab('volunteers')}>Volunteer Approvals</button>
             <button onClick={logout} style={{ marginTop: '20px', color: '#a83226', textAlign: 'left', padding: '12px' }}>Sign out</button>
           </aside>
           
@@ -183,6 +196,47 @@ export function AdminDashboard() {
                   </div>
                 ))}
                 {!data.announcements.length && <p className="muted">No announcements found.</p>}
+              </div>
+            )}
+
+            {activeTab === 'volunteers' && (
+              <div className="form-card">
+                <h2>Volunteer Applications</h2>
+                <div className="stats" style={{ marginBottom: '20px' }}>
+                  <div><strong>{data.volunteers.length}</strong><span>Total Applications</span></div>
+                  <div><strong>{data.volunteers.filter(v => v.status === 'pending').length}</strong><span>Pending Review</span></div>
+                </div>
+                {data.volunteers.length ? (
+                  <table>
+                    <thead><tr><th>Name</th><th>Seva</th><th>City</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody>
+                      {data.volunteers.map((v) => (
+                        <tr key={v._id}>
+                          <td><strong>{v.name}</strong><br/><small>{v.phone}</small></td>
+                          <td>{v.sevaCategory}<br/><small>{v.availability}</small></td>
+                          <td>{v.city}</td>
+                          <td>
+                            <span style={{ 
+                              padding: '4px 8px', borderRadius: '4px', fontSize: '0.85rem',
+                              background: v.status === 'approved' ? '#d4edda' : v.status === 'rejected' ? '#f8d7da' : '#fff3cd',
+                              color: v.status === 'approved' ? '#155724' : v.status === 'rejected' ? '#721c24' : '#856404'
+                            }}>
+                              {v.status.toUpperCase()}
+                            </span>
+                          </td>
+                          <td>
+                            {v.status === 'pending' && (
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={() => updateVolunteerStatus(v._id, 'approved')} style={{ background: '#28a745', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Approve</button>
+                                <button onClick={() => updateVolunteerStatus(v._id, 'rejected')} style={{ background: '#dc3545', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Reject</button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : <p className="muted">No volunteer applications yet.</p>}
               </div>
             )}
             

@@ -40,3 +40,8 @@ export async function createVolunteer(req, res) {
   const volunteer = await Volunteer.create(req.body);
   res.json({ success: true, volunteer });
 }
+
+export async function updateVolunteer(req, res) {
+  const volunteer = await Volunteer.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+  res.json({ success: true, volunteer });
+}
