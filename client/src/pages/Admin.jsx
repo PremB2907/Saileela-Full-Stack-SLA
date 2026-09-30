@@ -45,7 +45,7 @@ export function AdminLogin() {
 export function AdminDashboard() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
-  const [data, setData] = useState({ donations: [], announcements: [], yatra: null, volunteers: [] });
+  const [data, setData] = useState({ donations: [], announcements: [], yatra: null, volunteers: [], gallery: [] });
   const [error, setError] = useState('');
 
   if (!user) return <Navigate to="/admin/login" />;
@@ -68,6 +68,9 @@ export function AdminDashboard() {
       } else if (activeTab === 'volunteers') {
         const res = await api.get('/operations/volunteers');
         setData(d => ({ ...d, volunteers: res.data.volunteers || [] }));
+      } else if (activeTab === 'gallery') {
+        const res = await api.get('/operations/gallery');
+        setData(d => ({ ...d, gallery: res.data.gallery || [] }));
       }
     } catch (err) {
       setError('Could not load data.');
@@ -111,6 +114,30 @@ export function AdminDashboard() {
     }
   }
 
+  async function uploadImage(e) {
+    e.preventDefault();
+    try {
+      const formData = new FormData(e.currentTarget);
+      await api.post('/operations/gallery', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      alert('Image uploaded successfully');
+      e.target.reset();
+      loadData();
+    } catch(err) {
+      alert('Upload failed');
+    }
+  }
+
+  async function toggleGallery(id) {
+    try {
+      await api.patch(`/operations/gallery/${id}`);
+      loadData();
+    } catch(err) {
+      alert('Failed to update status');
+    }
+  }
+
   return (
     <>
       <PageHeader title="Saileela CMS">Central Command & Live Operations</PageHeader>
@@ -121,6 +148,7 @@ export function AdminDashboard() {
             <button style={{ fontWeight: activeTab === 'yatra' ? 'bold' : 'normal', textAlign: 'left', padding: '12px' }} onClick={() => setActiveTab('yatra')}>Yatra Live Control</button>
             <button style={{ fontWeight: activeTab === 'announcements' ? 'bold' : 'normal', textAlign: 'left', padding: '12px' }} onClick={() => setActiveTab('announcements')}>Announcements</button>
             <button style={{ fontWeight: activeTab === 'volunteers' ? 'bold' : 'normal', textAlign: 'left', padding: '12px' }} onClick={() => setActiveTab('volunteers')}>Volunteer Approvals</button>
+            <button style={{ fontWeight: activeTab === 'gallery' ? 'bold' : 'normal', textAlign: 'left', padding: '12px' }} onClick={() => setActiveTab('gallery')}>Gallery CMS</button>
             <button onClick={logout} style={{ marginTop: '20px', color: '#a83226', textAlign: 'left', padding: '12px' }}>Sign out</button>
           </aside>
           
@@ -237,6 +265,35 @@ export function AdminDashboard() {
                     </tbody>
                   </table>
                 ) : <p className="muted">No volunteer applications yet.</p>}
+              </div>
+            )}
+
+            {activeTab === 'gallery' && (
+              <div className="form-card">
+                <h2>Upload to Gallery</h2>
+                <form onSubmit={uploadImage} style={{ display: 'grid', gap: '15px', maxWidth: '500px', marginBottom: '40px' }}>
+                  <label className="field"><span>Image Title</span><input name="title" required /></label>
+                  <label className="field"><span>Caption</span><textarea name="caption"></textarea></label>
+                  <label className="field"><span>Image File</span><input type="file" name="image" accept="image/*" required /></label>
+                  <button className="button primary">Upload Image</button>
+                </form>
+
+                <h2>Published Images</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+                  {data.gallery.map(item => (
+                    <div key={item._id} style={{ border: '1px solid #dfc9a7', borderRadius: '8px', overflow: 'hidden', background: '#fff' }}>
+                      <img src={item.imagePath} alt={item.title} style={{ width: '100%', height: '150px', objectFit: 'cover' }} />
+                      <div style={{ padding: '15px' }}>
+                        <h4 style={{ margin: '0 0 5px', fontSize: '1rem' }}>{item.title}</h4>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+                          <span style={{ fontSize: '0.8rem', color: item.published ? 'green' : 'red', fontWeight: 'bold' }}>{item.published ? 'Live' : 'Hidden'}</span>
+                          <button onClick={() => toggleGallery(item._id)} style={{ background: 'none', border: '1px solid #dfc9a7', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Toggle</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {!data.gallery.length && <p className="muted">No images in gallery.</p>}
               </div>
             )}
             

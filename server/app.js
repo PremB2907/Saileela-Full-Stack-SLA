@@ -35,6 +35,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/tshirts', tshirtRoutes);
 app.use('/api/operations', operationsRoutes);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
 app.get('/api/health', (req, res) => res.json({ success: true, service: 'saileela-api' }));
 if (process.env.NODE_ENV === 'production') {
 	const clientDist = path.resolve(__dirname, '../client/dist');
