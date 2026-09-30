@@ -15,6 +15,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import receiptRoutes from './routes/receiptRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import tshirtRoutes from './routes/tshirtRoutes.js';
+import operationsRoutes from './routes/operationsRoutes.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/receipts', receiptRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/tshirts', tshirtRoutes);
+app.use('/api/operations', operationsRoutes);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.get('/api/health', (req, res) => res.json({ success: true, service: 'saileela-api' }));
 if (process.env.NODE_ENV === 'production') {

@@ -19,6 +19,10 @@ const yatraSchema = new mongoose.Schema({ currentDay: Number, totalDays: Number,
 const notificationSchema = new mongoose.Schema({ recipient: String, channel: { type: String, enum: ['sms', 'email'] }, message: String, status: String }, options);
 const settingsSchema = new mongoose.Schema({ key: { type: String, unique: true }, value: mongoose.Schema.Types.Mixed, verified: { type: Boolean, default: false } }, options);
 
+const announcementSchema = new mongoose.Schema({ title: { type: String, required: true }, message: { type: String, required: true }, priority: { type: String, enum: ['low', 'normal', 'high'], default: 'normal' }, startDate: Date, endDate: Date, published: { type: Boolean, default: false }, pinned: { type: Boolean, default: false } }, options);
+const sevaEventSchema = new mongoose.Schema({ title: { type: String, required: true }, category: { type: String, enum: ['Medical', 'Annadan', 'Water', 'Route', 'Registration', 'Crowd management', 'Digital', 'Photography', 'Cleanliness', 'General'] }, date: Date, location: String, time: String, capacity: Number, coordinator: String, status: { type: String, enum: ['upcoming', 'active', 'completed', 'cancelled'], default: 'upcoming' } }, options);
+const volunteerSchema = new mongoose.Schema({ name: { type: String, required: true }, phone: { type: String, required: true }, email: String, age: Number, city: String, skills: String, sevaCategory: String, availability: String, emergencyContact: String, status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' } }, options);
+
 export const User = mongoose.model('User', userSchema);
 export const Registration = mongoose.model('Registration', registrationSchema);
 export const Pass = mongoose.model('Pass', passSchema);
@@ -35,3 +39,6 @@ export const ScheduleEvent = mongoose.model('ScheduleEvent', scheduleSchema);
 export const YatraStatus = mongoose.model('YatraStatus', yatraSchema);
 export const Notification = mongoose.model('Notification', notificationSchema);
 export const SiteSettings = mongoose.model('SiteSettings', settingsSchema);
+export const Announcement = mongoose.model('Announcement', announcementSchema);
+export const SevaEvent = mongoose.model('SevaEvent', sevaEventSchema);
+export const Volunteer = mongoose.model('Volunteer', volunteerSchema);
